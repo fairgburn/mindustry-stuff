@@ -1,0 +1,56 @@
+# WIP
+
+# make a Mega move a liquid container somewhere else to refill it,
+# then bring it back
+START:
+    set fillX 366
+    set fillY 82
+    jump SKIPLOCATE notEqual cx null
+    sensor cx container1 @x
+    sensor cy container1 @y
+SKIPLOCATE:
+    set emptyX 0
+    set emptyY 0
+    jump MAIN notEqual @unit null
+
+BIND:
+    ubind @mega
+    sensor controlled @unit @controlled
+    jump BIND notEqual controlled 0
+
+MAIN:
+    sensor cryo container1 @cryofluid
+    op floor cryo cryo 
+    jump EMPTY equal cryo 0
+    end
+
+EMPTY:
+    ucontrol move cx cy 0 0 0
+    ucontrol within cx cy 0.2 inPosition 0
+    jump EMPTY notEqual inPosition true
+    ucontrol payTake 0 0 0 0 0
+    sensor payload @unit @payloadCount
+    jump EMPTY equal payload 0
+REFILL:
+    ucontrol move fillX fillY 0 0 0
+    ucontrol within fillX fillY 0.2 inPosition 0
+    jump REFILL notEqual inPosition true
+    ucontrol payDrop 0 0 0 0 0
+    sensor payload @unit @payloadCount
+    jump REFILL notEqual payload 0
+    wait 3
+RETURN1:
+    ucontrol move fillX fillY 0 0 0
+    ucontrol payTake 0 0 0 0 0
+    sensor payload @unit @payloadCount
+    jump RETURN1 equal payload 0
+RETURN2:
+    ucontrol move cx cy 0 0 0
+    ucontrol within cx cy 0.2 inPosition 0
+    jump RETURN2 notEqual inPosition true
+    ucontrol payDrop 0 0 0 0 0
+    sensor payload @unit @payloadCount
+    jump RETURN2 notEqual payload 0
+
+
+

@@ -1,0 +1,95 @@
+print "delete after placing"
+end
+
+set unitType @poly
+jump doBind strictEqual @unit null
+    
+settings: 
+    print "settings (pickup at 0,0 for core)"
+    print "deliver 0,0 to assume container1"
+    set getore @blast-compound
+    set pickupX 0
+    set pickupY 0
+    set deliverX 0
+    set deliverY 0
+
+print "no touching below here"
+op or customPickup pickupX pickupY
+op or customDelivery deliveryX deliveryY
+ulocate building core false @copper bx by found core
+
+status: 
+    sensor oremax @unit @itemCapacity
+    sensor oreheld @unit @firstItem
+    op notEqual badore getore oreheld
+    sensor hasore @unit @totalItems
+    op land doreturn badore hasore
+        jump checkformax equal doreturn false
+
+dropAtCore:
+    print "return bad ore"
+    ucontrol approach bx by 5 0 0
+    ucontrol itemDrop core getore oremax 0 0
+    end
+    
+checkformax: 
+    jump deliver equal hasore oremax
+    ucontrol itemTake store getore oremax 0 0
+
+pickup:
+    print "pick up"
+        jump pickupCustom equal customPickup true
+    
+    # default pickup routine, just pick up from core
+    ucontrol approach bx by 5 0 0
+    ucontrol itemTake core getore oremax 0 0
+    end
+    
+    pickupCustom:
+        ucontrol approach pickupX pickupY 5 0 0
+        ulocate building storage false @copper px py found store
+        ucontrol itemTake store getore oremax 0 0
+        end
+
+deliver:
+        jump deliveryCustom equal customDelivery true
+
+    # default delivery routine, in order of preference:
+    # try delivering to 
+    # 1. a CPU linked container called container1
+    # 2. a CPU linked vault called vault1
+    # 3. ulocate the nearest physical storage block to the CPU
+    # 4. take it back to the core, something is going very wrong
+
+    sensor cx container1 @x
+    sensor cy container1 @y
+        jump tryDeliverVault strictEqual cx null
+    ucontrol approach cx cy 5 0 0
+    ucontrol itemDrop container1 oremax 0 0 0
+    end
+
+    tryDeliverVault:
+        sensor vx vault1 @x
+        sensor vy vault1 @y
+            jump searchAndDeliver strictEqual vx null
+        ucontrol approach vx vy 5 0 0
+        ucontrol itemDrop vault1 oremax 0 0 0
+        end
+
+    searchAndDeliver:
+        set searching true
+        ucontrol approach @thisx @thisy 5 0 0
+        ulocate building storage false @copper sx sy found store
+        # TODO, INCOMPLETE
+        end
+
+    deliveryCustom:
+        ucontrol approach deliverX deliverY 5 0 0
+        ulocate building storage false @copper sx sy found store
+        ucontrol itemDrop store oremax 0 0 0
+        end
+
+doBind: 
+    ubind unitType
+    sensor bound @unit @controlled
+        jump doBind notEqual bound 0

@@ -1,0 +1,14 @@
+set i 0
+getlink link i
+jump 0 strictEqual link null
+sensor type link @type
+jump 12 notEqual type @thorium-reactor
+sensor cryo link @cryofluid
+sensor hp link @health
+sensor maxhp link @maxHealth
+op equal healthy hp maxhp
+op greaterThan cool cryo 5
+op land active healthy cool
+control enabled link active 0 0 0
+op add i i 1
+jump 1 always x false

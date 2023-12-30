@@ -1,0 +1,56 @@
+START:
+    # make a unit pick up from some linked building and deliver to the core
+    # change these first 3 variables to suit your needs
+    set product @thorium
+    set drone @poly
+    set storage container1 # name of the CPU linked block 
+                           # can be anything with an item capacity
+                           # if you forget to link this, unit will move to 0,0
+    set toCore true # false if going the other way (core to storage container)
+    jump MAIN notEqual @unit null
+
+BIND:
+    ubind drone
+    sensor controlled @unit @controlled
+    jump BIND notEqual controlled 0
+
+MAIN:
+    ulocate building core false @copper bx by found core
+    sensor cx storage @x
+    sensor cy storage @y
+    set dx bx
+    set dy by
+    set px cx
+    set py cy
+    set source storage
+    set destination core
+    jump MAIN_ equal toCore true
+    set dx cx
+    set dy cy
+    set px bx
+    set py by
+    set source core
+    set destination storage
+MAIN_:
+    sensor typeHeld @unit @firstItem
+    sensor amountHeld @unit @totalItems
+    sensor umax @unit @itemCapacity
+    op notEqual wrongType typeHeld product
+    op land wrongType wrongType amountHeld
+    jump PICKUP notEqual wrongType true
+
+WRONGITEM:
+    ucontrol approach bx by 5 0 0
+    ucontrol itemDrop core amountHeld 0 0 0
+    end
+
+DELIVER:
+    ucontrol approach dx dy 5 0 0
+    ucontrol itemDrop destination amountHeld 0 0 0
+    end
+
+PICKUP:
+    jump DELIVER equal amountHeld umax
+    ucontrol approach px py 5 0 0
+    ucontrol itemTake source product umax 0 0
+    end

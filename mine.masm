@@ -1,0 +1,28 @@
+set mine @coal
+jump MAIN notEqual @unit null_
+
+DOBIND:
+    ubind @mega
+    sensor controlled @unit @controlled
+    jump DOBIND notEqual controlled 0
+
+MAIN:
+    sensor max @unit @itemCapacity
+    sensor typeHeld @unit @firstItem
+    sensor held @unit @totalItems
+    op notEqual wrongItem typeHeld mine
+    op land return wrongItem held
+    jump DORETURN equal return true
+    jump DORETURN equal held max
+
+MINERESOURCE:
+    ulocate ore core true mine tx ty found building
+    ucontrol approach tx ty 5 0 0
+    ucontrol mine tx ty 0 0 0
+    end
+
+DORETURN:
+    ulocate building core false @copper bx by found core
+    ucontrol approach bx by 5 0 0
+    ucontrol itemDrop core held 0 0 0
+    end
