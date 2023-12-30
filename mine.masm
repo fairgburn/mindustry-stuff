@@ -1,8 +1,16 @@
+# Make a unit mine a specific resource and deliver it to the core. 
+
+# Would probably need some logic for boosting if you wanted to use a ground 
+# unit, but megas were always good enough for me. 
+
+# settings
 set mine @coal
+set drone @mega
+
 jump MAIN notEqual @unit null_
 
 DOBIND:
-    ubind @mega
+    ubind drone
     sensor controlled @unit @controlled
     jump DOBIND notEqual controlled 0
 
