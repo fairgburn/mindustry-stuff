@@ -1,4 +1,8 @@
-# WIP
+# WIP, use at your own risk, if I ever need it again I'll commit a fix to make it reliable. 
+
+# My megas would be off by a tile in the direction of their destination when dropping off sometimes,
+# the logic to detect when it's safe to drop off needs improvement. This was a quick and dirty
+# solution for some turrets on an island on Naval Fortress. 
 
 # make a Mega move a liquid container somewhere else to refill it,
 # then bring it back
@@ -51,6 +55,3 @@ RETURN2:
     ucontrol payDrop 0 0 0 0 0
     sensor payload @unit @payloadCount
     jump RETURN2 notEqual payload 0
-
-
-

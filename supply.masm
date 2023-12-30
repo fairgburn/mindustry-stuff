@@ -1,12 +1,14 @@
 START:
-    # make a unit pick up from some linked building and deliver to the core
-    # change these first 3 variables to suit your needs
+    # Make a unit pick up from linked storage and deliver to the core, or vice-versa.
+    # Change 'toCore' to false if taking from the core to remote storage.
+
+    # settings  
     set product @thorium
     set drone @poly
     set storage container1 # name of the CPU linked block 
                            # can be anything with an item capacity
-                           # if you forget to link this, unit will move to 0,0
-    set toCore true # false if going the other way (core to storage container)
+                           # if you forget to link this building to the CPU, unit will move to 0,0
+    set toCore true # false if going the other way (from core to storage container)
     jump MAIN notEqual @unit null
 
 BIND:
@@ -14,6 +16,11 @@ BIND:
     sensor controlled @unit @controlled
     jump BIND notEqual controlled 0
 
+# (c,d,p,b)x/y = container/delivery/pickup/base (core) X,Y coordinates 
+# set delivery coords as the core and pickup as remote storage by default,
+# but reverse those if 'toCore' is false 
+
+# if a unit gets bound while holding something we don't want, run it back to the core first
 MAIN:
     ulocate building core false @copper bx by found core
     sensor cx storage @x
